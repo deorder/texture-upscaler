@@ -26,8 +26,11 @@
  - The results will be stored inside the `./output` directory
 
  **Note:** Try out different combinations. All shell scripts have options that you can change at the top
+ 
  **Note:** Upscaling the textures before running SFT may give better results
+ 
  **Note:** You may want to upscale normal maps using ESRGAN only. Do not forget to renormalize them.
+ 
  **Note:** If you change the overlap in step 1, change the overlap in step 6 accordingly
 
 ## Requirements
