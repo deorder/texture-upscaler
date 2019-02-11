@@ -1,5 +1,5 @@
 #!/bin/bash
-ARGS="${@-./textures}"
+ARGS="${@-./input}"
 
 shopt -s extglob
 
