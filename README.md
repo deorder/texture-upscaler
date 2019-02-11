@@ -32,13 +32,17 @@
  **Note:** You may want to upscale normal maps using ESRGAN only. Do not forget to renormalize them.
  
  **Note:** If you change the overlap in step 1, change the overlap in step 6 accordingly
+ 
+## Troubleshooting
+
+- You may have to increase some of the values in Image Magick's `policy.xml` file to allow for more memory to be used.
+- If Image Magick keeps complaining about memory limits you can comment out the `resource` lines in `policy.xml`
 
 ## Requirements
- 
+ - Bash (if you do not have Linux you can try the Git for Window's Bash instead)
  - Image Magick
  - ESRGAN: https://github.com/xinntao/ESRGAN
  - SFTGAN: https://github.com/xinntao/SFTGAN
  - Python 3 64-bit
  - PyTorch
  - Cuda (optional, but recommended if you have an NVidia)
- - Bash
