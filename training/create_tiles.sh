@@ -16,7 +16,6 @@ MAX_TILE_HEIGHT=$((64 * ${RATIO_FACTOR}))
 
 mkdir -p "${OUTPUT_DIR}"
 
-
 find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENAME; do
 
   DIRNAME=$(dirname "${FILENAME}")
