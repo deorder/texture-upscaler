@@ -54,7 +54,7 @@ cat index.txt | while read ENTRY; do
   RGB_ARGS="${BLEND_ARGS} ${COMPOSITE_ARGS} -delete 0 -compose Over -mosaic"
 
   if [ "${COLOR_TYPE}" == "rgba" ] || [ "${COLOR_TYPE}" == "srgba" ]; then
-    COMMAND="convert \\( ${RGB_ARGS} \\) -alpha set \\( ${ALPHA_ARGS} \\) -alpha off -compose copy_opacity -composite -resize ${RESIZE} \"${OUTPUT_DIR}/${DIRNAME}/${BASENAME}.png\""
+    COMMAND="convert \\( ${RGB_ARGS} -resize ${RESIZE} \\) \\( ${ALPHA_ARGS} -colorspace gray -alpha off -resize ${RESIZE} \\) -compose copy-opacity -composite \"${OUTPUT_DIR}/${DIRNAME}/${BASENAME}.png\""
   fi
 
   if [ "${COLOR_TYPE}" == "rgb" ] || [ "${COLOR_TYPE}" == "srgb" ]; then
