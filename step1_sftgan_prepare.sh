@@ -1,21 +1,30 @@
 #!/bin/bash
 ARGS="${@-./input}"
 
-:> index.txt
 shopt -s extglob
 
-RESIZE=2
-OVERDRAW=16
-TILE_COUNT=16
-
-FILTER=point
-INTERPOLATE=Nearest
-
 INPUT_DIR=${ARGS}
-SFTGAN_DIR=./sftgan
 
-TILE_PER_ROW=$(echo "${TILE_COUNT}" | awk '{print sqrt($1)}')
-TILE_PER_COLUMN=$(echo "${TILE_COUNT}" | awk '{print sqrt($1)}')
+MIN_TILE_WIDTH=64
+MIN_TILE_HEIGHT=64
+
+MAX_TILE_WIDTH=128
+MAX_TILE_HEIGHT=128
+
+# Examples
+LR_SCALE=25%
+LR_FILTER=point
+LR_INTERPOLATE=Nearest
+LR_OUTPUT_DIR=./output.lr
+
+# Ground truth
+HR_SCALE=100%
+HR_FILTER=point
+HR_INTERPOLATE=Nearest
+HR_OUTPUT_DIR=./output.hr
+
+mkdir -p "${LR_OUTPUT_DIR}"
+mkdir -p "${HR_OUTPUT_DIR}"
 
 find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENAME; do
 
@@ -25,45 +34,48 @@ find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENA
   ESCAPED_FILE=$(printf '%q' "${FILENAME}")
   DIRNAME_HASH=$(echo ${DIRNAME} | md5sum | cut -d' ' -f1)
 
-  COLOR_TYPE=$(identify -format '%[channels]' "${FILENAME}")
-  IMAGE_WIDTH=$(identify -format '%[width]' "${FILENAME}")
-  IMAGE_HEIGHT=$(identify -format '%[height]' "${FILENAME}")
+  if [ ! -f "${OUTPUT_DIR}/${DIRNAME_HASH}_${BASENAME}_000.png" ]; then
 
-  RELATIVE_DIR=$(realpath --relative-to "${INPUT_DIR}" "${DIRNAME}")
+    IMAGE_WIDTH=$(identify -format '%[width]' "${FILENAME}")
+    IMAGE_HEIGHT=$(identify -format '%[height]' "${FILENAME}")
+    COLOR_TYPE=$(identify -format '%[channels]' "${FILENAME}")
 
-  echo ${FILENAME}
+    RELATIVE_DIR=$(realpath --relative-to "${INPUT_DIR}" "${DIRNAME}")
 
-  NEW_IMAGE_WIDTH=$((${IMAGE_WIDTH} * ${RESIZE}))
-  NEW_IMAGE_HEIGHT=$((${IMAGE_HEIGHT} * ${RESIZE}))
-  TILE_WIDTH=$((${NEW_IMAGE_WIDTH} / ${TILE_PER_COLUMN}))
-  TILE_HEIGHT=$((${NEW_IMAGE_HEIGHT} / ${TILE_PER_ROW}))
+    if [ "$((${IMAGE_WIDTH}))" -ge "${MIN_TILE_WIDTH}" ] && [ "$((${IMAGE_HEIGHT}))" -ge "${MIN_TILE_HEIGHT}" ]; then
 
-  if [ "${COLOR_TYPE}" == "rgb" ] || [ "${COLOR_TYPE}" == "rgba" ] || [ "${COLOR_TYPE}" == "srgb" ] || [ "${COLOR_TYPE}" == "srgba" ]; then
-    for TILE_ROW_INDEX in $(seq 0 $((${TILE_PER_ROW} - 1))); do
-      for TILE_COLUMN_INDEX in $(seq 0 $((${TILE_PER_COLUMN} - 1))); do
+      VERTICAL_SUBDIVISIONS=$((${IMAGE_HEIGHT} / ${MAX_TILE_HEIGHT}))
+      if [ "${VERTICAL_SUBDIVISIONS}" -lt "1" ]; then
+        VERTICAL_SUBDIVISIONS=$((${IMAGE_HEIGHT} / ${MIN_TILE_HEIGHT}))
+      fi
+      HORIZONTAL_SUBDIVISIONS=$((${IMAGE_WIDTH} / ${MAX_TILE_WIDTH}))
+      if [ "${HORIZONTAL_SUBDIVISIONS}" -lt "1" ]; then
+        HORIZONTAL_SUBDIVISIONS=$((${IMAGE_WIDTH} / ${MIN_TILE_WIDTH}))
+      fi
 
-        TILE_INDEX=$(((${TILE_ROW_INDEX} * ${TILE_PER_ROW}) + ${TILE_COLUMN_INDEX}))
-        TILE_X1=$((${TILE_COLUMN_INDEX} * ${TILE_WIDTH}))
-        TILE_Y1=$((${TILE_ROW_INDEX} * ${TILE_HEIGHT}))
-        TILE_X2=$(((${TILE_COLUMN_INDEX} * ${TILE_WIDTH}) + ${TILE_WIDTH}))
-        TILE_Y2=$(((${TILE_ROW_INDEX} * ${TILE_HEIGHT}) + ${TILE_HEIGHT}))
-
-        convert "${FILENAME}" -interpolate ${INTERPOLATE} -filter ${FILTER} -alpha off -resize ${NEW_IMAGE_WIDTH}x${NEW_IMAGE_HEIGHT} -crop $((${TILE_WIDTH} + ${OVERDRAW}))x$((${TILE_HEIGHT} + ${OVERDRAW}))+${TILE_X1}+${TILE_Y1} +repage +adjoin -define png:color-type=2 "${SFTGAN_DIR}/data/samples/${DIRNAME_HASH}_${BASENAME}_${TILE_INDEX}.png"
-
-        if [ "${COLOR_TYPE}" == "rgba" ] || [ "${COLOR_TYPE}" == "srgba" ]; then
-          convert "${FILENAME}" -interpolate ${INTERPOLATE} -filter ${FILTER} -alpha extract -resize ${NEW_IMAGE_WIDTH}x${NEW_IMAGE_HEIGHT} -crop $((${TILE_WIDTH} + ${OVERDRAW}))x$((${TILE_HEIGHT} + ${OVERDRAW}))+${TILE_X1}+${TILE_Y1} +repage +adjoin -define png:color-type=2 "${SFTGAN_DIR}/data/samples/${DIRNAME_HASH}_${BASENAME}_alpha_${TILE_INDEX}.png"
+      if [ "$(convert "${FILENAME}" -alpha off -format "%[k]" info:)" -gt "1" ]; then
+        echo ${FILENAME}, rgb \(${IMAGE_WIDTH}x${IMAGE_HEIGHT} divided by ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}\)
+        convert "${FILENAME}" -alpha off -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${HR_INTERPOLATE} -filter ${HR_FILTER} -resize ${HR_SCALE} "${HR_OUTPUT_DIR}/${DIRNAME_HASH}_${BASENAME}_%03d.png"
+        convert "${FILENAME}" -alpha off -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${LR_INTERPOLATE} -filter ${LR_FILTER} -resize ${LR_SCALE} "${LR_OUTPUT_DIR}/${DIRNAME_HASH}_${BASENAME}_%03d.png"
+      else
+        echo ${FILENAME}, rgb single color, skipped
+      fi
+      if [ "${COLOR_TYPE}" == "rgba" ] || [ "${COLOR_TYPE}" == "srgba" ]; then
+        if [ "$(convert "${FILENAME}" -alpha extract -format "%[k]" info:)" -gt "1" ]; then
+          echo ${FILENAME}, alpha \(${IMAGE_WIDTH}x${IMAGE_HEIGHT} divided by ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}\)
+          convert "${FILENAME}" -alpha extract -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${HR_INTERPOLATE} -filter ${HR_FILTER} -resize ${HR_SCALE} "${HR_OUTPUT_DIR}/${DIRNAME_HASH}_${BASENAME}_alpha_%03d.png"
+          convert "${FILENAME}" -alpha extract -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${LR_INTERPOLATE} -filter ${LR_FILTER} -resize ${LR_SCALE} "${LR_OUTPUT_DIR}/${DIRNAME_HASH}_${BASENAME}_alpha_%03d.png"
+        else
+          echo ${FILENAME}, alpha single color, skipped
         fi
+      fi
 
-      done
-    done
-
-    if [ "${COLOR_TYPE}" == "rgba" ] || [ "${COLOR_TYPE}" == "srgba" ]; then
-      echo "${DIRNAME_HASH}:${BASENAME}:${RELATIVE_DIR}:rgba:${IMAGE_WIDTH}:${IMAGE_HEIGHT}:${TILE_PER_ROW}:${TILE_PER_COLUMN}" >> index.txt
-    elif [ "${COLOR_TYPE}" == "rgb" ] || [ "${COLOR_TYPE}" == "srgb" ]; then
-      echo "${DIRNAME_HASH}:${BASENAME}:${RELATIVE_DIR}:rgb:${IMAGE_WIDTH}:${IMAGE_HEIGHT}:${TILE_PER_ROW}:${TILE_PER_COLUMN}" >> index.txt
+    else
+      echo ${FILENAME} too small \(${IMAGE_WIDTH}x${IMAGE_HEIGHT}\), skipped
     fi
+
   else
-    echo "${FILENAME} is ${COLOR_TYPE}, skipping"
+    echo ${FILENAME}, already processed, skipped
   fi
-  
+
 done
