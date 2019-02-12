@@ -84,6 +84,8 @@ cleanup_task() {
     return
   fi
 
+  sleep 0.5
+  
 }
 
 find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENAME; do
