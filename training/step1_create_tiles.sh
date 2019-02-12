@@ -1,21 +1,20 @@
 #!/bin/bash
-ARGS="${@-./input}"
-
 shopt -s extglob
 
-INPUT_DIR=${ARGS}
+THREADS="4"
+INPUT_DIR="./input"
 
 # Examples
 LR_SCALE=25%
 LR_FILTER=point
 LR_INTERPOLATE=Nearest
-LR_OUTPUT_DIR=./output/LR
+LR_OUTPUT_DIR="./output/LR"
 
 # Ground truth
 HR_SCALE=100%
 HR_FILTER=point
 HR_INTERPOLATE=Nearest
-HR_OUTPUT_DIR=./output/HR
+HR_OUTPUT_DIR="./output/HR"
 
 # Min and max must be equal
 MIN_TILE_WIDTH=128
@@ -27,9 +26,80 @@ MAX_TILE_HEIGHT=128
 # Category regexp for Skyrim SE
 CATEGORY_REGEXP='s/.*_\(a\|b\|d\|e\|g\|h\|m\|n\|p\|s\|an\|bl\|em\|sk\|msn\|rim\)$/\1/ip'
 
+for OPTION in "$@"; do
+  case ${OPTION} in
+    -t=*|--threads=*)
+    THREADS="${OPTION#*=}"
+    shift
+    ;;
+    -i=*|--input-dir=*)
+    INPUT_DIR="${OPTION#*=}"
+    shift
+    ;;
+    --lr-scale-=*)
+    LR_SCALE="${OPTION#*=}"
+    shift
+    ;;
+    --lr-filter=*)
+    LR_FILTER="${OPTION#*=}"
+    shift
+    ;;
+    --lr-interpolate-=*)
+    LR_INTERPOLATE="${OPTION#*=}"
+    shift
+    ;;
+    -l=*|--lr-output-dir=*)
+    LR_OUTPUT_DIR="${OPTION#*=}"
+    shift
+    ;;
+    --hr-scale-=*)
+    HR_SCALE="${OPTION#*=}"
+    shift
+    ;;
+    --hr-filter=*)
+    HR_FILTER="${OPTION#*=}"
+    shift
+    ;;
+    --hr-interpolate-=*)
+    HR_INTERPOLATE="${OPTION#*=}"
+    shift
+    ;;
+    -h=*|--hr-output-dir=*)
+    HR_OUTPUT_DIR="${OPTION#*=}"
+    shift
+    ;;
+    -w=*|--tile-width=*)
+    MIN_TILE_WIDTH="${OPTION#*=}"
+    MAX_TILE_WIDTH="${OPTION#*=}"
+    shift
+    ;;
+    -h=*|--tile-height=*)
+    MIN_TILE_HEIGHT="${OPTION#*=}"
+    MAX_TILE_HEIGHT="${OPTION#*=}"
+    shift
+    ;;
+    *)
+      echo "usage: $@ ..."
+      echo "-t, --threads \"<number>\" (default: ${THREADS})"
+      echo "-i, --input-dir \"<input dir>\" (default: ${INPUT_DIR})"
+      echo "--lr-scale \"<percentage>\" (default: ${LR_SCALE})"
+      echo "--lr-filter \"<filter>\" (default: ${LR_FILTER})"
+      echo "--lr-interpolate \"<interpolate>\" (default: ${LR_INTERPOLATE})"
+      echo "-l, --lr-output-dir \"<lr output dir>\" (default: ${LR_OUTPUT_DIR})"
+      echo "--hr-scale \"<percentage>\" (default: ${HR_SCALE})"
+      echo "--hr-filter \"<filter>\" (default: ${HR_FILTER})"
+      echo "--hr-interpolate \"<interpolate>\" (default: ${HR_INTERPOLATE})"
+      echo "-h, --hr-output-dir \"<hr output dir>\" (default: ${HR_OUTPUT_DIR})"
+      echo "-w, --tile-width \"<pixels>\" (default: ${MIN_TILE_WIDTH})"
+      echo "-h, --tile-height \"<pixels>\" (default: ${MIN_TILE_HEIGHT})"
+      exit 1
+    ;;
+  esac
+done
+
 wait_for_jobs() {
   local JOBLIST=($(jobs -p))
-  if [ "${#JOBLIST[@]}" -gt "4" ]; then
+  if [ "${#JOBLIST[@]}" -gt "${THREADS}" ]; then
     for JOB in ${JOBLIST}; do
       echo Waiting for job ${JOB}...
       wait ${JOB}
@@ -37,7 +107,7 @@ wait_for_jobs() {
   fi
 }
 
-find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENAME; do
+while read FILENAME; do
 
   DIRNAME=$(dirname "${FILENAME}")
 
@@ -104,6 +174,9 @@ find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENA
     echo ${FILENAME}, already processed, skipped
   fi
   
-done
+done < <(find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \))
 
 wait_for_jobs
+wait
+
+echo "finished"

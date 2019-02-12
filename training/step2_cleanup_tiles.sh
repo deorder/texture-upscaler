@@ -1,20 +1,12 @@
 #!/bin/bash
-ARGS="${@-./output}"
-
 shopt -s extglob
 
-OUTPUT_DIR=${ARGS}
+THREADS="16"
 
 # Min colors treshold
 MIN_COLORS=8
 
 # Min and max must be equal
-LR_MIN_TILE_WIDTH=32
-LR_MIN_TILE_HEIGHT=32
-
-LR_MAX_TILE_WIDTH=32
-LR_MAX_TILE_HEIGHT=32
-
 HR_MIN_TILE_WIDTH=128
 HR_MIN_TILE_HEIGHT=128
 
@@ -22,14 +14,55 @@ HR_MAX_TILE_WIDTH=128
 HR_MAX_TILE_HEIGHT=128
 
 # Examples
-LR_OUTPUT_DIR=${OUTPUT_DIR}/LR
+LR_OUTPUT_DIR="./output/LR"
 
 # Ground truth
-HR_OUTPUT_DIR=${OUTPUT_DIR}/HR
+HR_OUTPUT_DIR="./output/HR"
+
+for OPTION in "$@"; do
+  case ${OPTION} in
+    -t=*|--threads=*)
+    THREADS="${OPTION#*=}"
+    shift
+    ;;
+    -c=*|--min-colors=*)
+    MIN_COLORS="${OPTION#*=}"
+    shift
+    ;;
+    -l=*|--lr-output-dir=*)
+    LR_OUTPUT_DIR="${OPTION#*=}"
+    shift
+    ;;
+    -h=*|--hr-output-dir=*)
+    HR_OUTPUT_DIR="${OPTION#*=}"
+    shift
+    ;;
+    -w=*|--tile-width=*)
+    HR_MIN_TILE_WIDTH="${OPTION#*=}"
+    HR_MAX_TILE_WIDTH="${OPTION#*=}"
+    shift
+    ;;
+    -h=*|--tile-height=*)
+    HR_MIN_TILE_HEIGHT="${OPTION#*=}"
+    HR_MAX_TILE_HEIGHT="${OPTION#*=}"
+    shift
+    ;;
+    *)
+      echo "usage: $@ ..."
+      echo "-t, --threads \"<number>\" (default: ${THREADS})"
+      echo "-c, --min-colors \"<number>\" (default: ${MIN_COLORS})"
+      echo "-l, --lr-output-dir \"<lr output dir>\" (default: ${LR_OUTPUT_DIR})"
+      echo "-h, --hr-output-dir \"<hr output dir>\" (default: ${HR_OUTPUT_DIR})"
+      echo "-w, --tile-width \"<pixels>\" (default: ${HR_MIN_TILE_WIDTH})"
+      echo "-h, --tile-height \"<pixels>\" (default: ${HR_MIN_TILE_HEIGHT})"
+      exit 1
+    ;;
+  esac
+done
 
 wait_for_jobs() {
   local JOBLIST=($(jobs -p))
-  if [ "${#JOBLIST[@]}" -gt "16" ]; then
+  if [ "${#JOBLIST[@]}" -gt "${THREADS}" ]; then
     for JOB in ${JOBLIST}; do
       echo Waiting for job ${JOB}...
       wait ${JOB}
@@ -57,7 +90,7 @@ cleanup_task() {
   echo ${RELATIVE_DIR}/${BASENAME_NO_EXT} \(${IMAGE_WIDTH} ${IMAGE_HEIGHT} ${IMAGE_CHANNELS} ${IMAGE_COLORS}\)
 
   if [ "${IMAGE_COLORS}" -le "${MIN_COLORS}" ]; then
-    echo ${BASENAME_NO_EXT}, too little colors \(${MIN_COLORS}\), delete
+    echo ${BASENAME_NO_EXT}, too little colors \(${IMAGE_COLORS}\), delete
     rm -f ${HR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     rm -f ${LR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     return
@@ -88,9 +121,12 @@ cleanup_task() {
   
 }
 
-find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENAME; do
+while read FILENAME; do
  wait_for_jobs
  cleanup_task ${FILENAME} &
-done
+done < <(find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png" \))
 
 wait_for_jobs
+wait
+
+echo "finished"

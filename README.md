@@ -1,29 +1,67 @@
-# Cathedral Project texture upscaler using ESRGAN and SFTGAN
+# Cathedral Project texture scripts to prepare for ESRGAN, SFTGAN or others
 
-## Installation
+## Description
+
+The included scripts are for preparing your images to be used by ESRGAN, SFTGAN or others
+
+### Description of steps to prepare for inference ###
+**Step 1:** Create tiles with overlap, separating the RGB and alpha, with optional rescaling
+**Step 2:** Copy tiles from one directory to the next, with optional rescaling while copying
+**Step 3:** Reassemble tiles and use the overlap for blending (to remove seams), recombine the RGB and alpha, with optional rescaling
+
+### Description of steps to prepare for training  ###
+**Step 1:** Create equal size tiles (1 for HR/GT, 1 downscaled for LR), separating the RGB and alpha, use separate directories according to regexp
+**Step 2:** Cleanup tiles, remove tiles that have too little colors and/or that do not fit the required size for HR/GT and LR
+
+## Installation for use with ESRGAN and/or SFTGAN
+
+### If you want to use ESRGAN
 
  - Install ESRGAN to `./esrgan`
- 
  - Follow the instructions for installing ESRGAN at: https://github.com/xinntao/ESRGAN
 
- - Install SFTGAN to `./sftgan`
+### If you want to use SFTGAN
 
+ - Install SFTGAN to `./sftgan`
  - Follow the instructions for installing SFTGAN at: https://github.com/xinntao/SFTGAN
 
-## Usage (inference)
+## Usage for inference/upscaling with ESRGAN and/or SFTGAN
 
- - Put all the textures you want to process inside the `./input` directory
+### Steps when you want to use ESRGAN only
 
- - Run all steps (some may take a long time to complete, also check out the settings at the top of the `.sh` files)
+  - Put all the textures you want to process inside the `./input` directory
+  - `./step1_create_tiles.sh --output-dir="./esrgan/LR"`
+  - `pushd ./esrgan/; python3 test.py ./models/RRDB_ESRGAN_x4.pth; popd` (Replace model path if you want)
+  - `./step3_assemble_tiles.sh --input-dir="./esrgan/results" --input-postfix="_rlt"`
+  - Results will be inside `./output`
 
-   - *step 1:* separating RGB and alpha, upscaling by 200%, cutting the image in 16 tiles + 16px overlap
-   - *step 2:* running the semantic segmentation on all the tiles
-   - *step 3:* running SFTGAN on all tiles, they will have the same dimensions as the input files but with more details added
-   - *step 4:* preparing the result from SFTGAN to be processed by ESRGAN
-   - *step 5:* running ESRGAN on all tiles upscaling them by 400%
-   - *step 6:* combining all tiles (also recombining the RGB and alpha channels where needed) using the overlap for blending to prevent seams
+### Steps when you want to use SFTGAN only
 
- - The results will be stored inside the `./output` directory
+  - Put all the textures you want to process inside the `./input` directory
+  - `./step1_create_tiles.sh --output-dir="sftgan/data/samples" --rescale="200%"` (SFTGAN requires you to upscale first)
+  - `pushd ./sftgan/pytorch_test/; python3 test_sftgan.py; popd`
+  - `./step3_assemble_tiles.sh --input-dir="./sftgan/data/samples_result" --input-postfix="_rlt"`
+  - Results will be inside `./output`
+
+### Steps when you want to use ESRGAN and then SFTGAN
+
+  - Put all the textures you want to process inside the `./input` directory
+  - `./step1_create_tiles.sh --output-dir="./esrgan/LR"`
+  - `pushd ./esrgan/; python3 test.py ./models/RRDB_ESRGAN_x4.pth; popd` (Replace model path if you want)
+  - `./step2_copy_tiles.sh --input-dir="./esrgan/results" --output-dir"./sftgan/data/samples" --input-postfix="_rlt"`
+  - `pushd ./sftgan/pytorch_test/; python3 test_sftgan.py; popd`
+  - `./step3_assemble_tiles.sh --input-dir="./sftgan/data/samples_result" --input-postfix="_rlt"`
+  - Results will be inside `./output`
+
+### Steps when you want to use SFTGAN and then ESRGAN
+
+  - Put all the textures you want to process inside the `./input` directory
+  - `./step1_create_tiles.sh --output-dir="./sftgan/data/samples" --rescale="200%"` (SFTGAN requires you to upscale first)
+  - `pushd ./sftgan/pytorch_test/; python3 test_sftgan.py; popd`
+  - `./step2_copy_tiles.sh --input-dir="./sftgan/data/samples_result" --output-dir="./esrgan/LR" --input-postfix="_rlt"`
+  - `pushd ./esrgan/; python3 test.py ./models/RRDB_ESRGAN_x4.pth; popd` (Replace model path if you want)
+  - `./step3_assemble_tiles.sh --input-dir="./esrgan/results" --input-postfix="_rlt"`
+  - Results will be inside `./output`
 
  **Note:** Try out different combinations. All shell scripts have options that you can change at the top
  
@@ -32,16 +70,16 @@
  **Note:** You may want to upscale normal maps using ESRGAN only. Do not forget to renormalize them.
  
  **Note:** If you change the overlap in step 1, change the overlap in step 6 accordingly
- 
-## Usage (training) (WiP)
+
+ **Note:** Everything works much better on Linux
+
+## Usage to prepare for training (WiP)
 
  - Put all textures you want to use for training in `./training/input`
- 
  - Go to the `./training` directory
- 
- - Run `./create_tiles.sh`
- 
- - Run `./cleanup_tiles.sh`
+ - `./step1_create_tiles.sh`
+ - `./step2_cleanup_tiles.sh`
+ - Results will be inside `./training/output`
  
 ## Troubleshooting
 
@@ -49,10 +87,10 @@
 - If Image Magick keeps complaining about memory limits you can comment out the `resource` lines in `policy.xml`
 
 ## Requirements
+ - Cuda (optional, but recommended if you have an NVidia) (On Linux you can just install the latest NVidia drivers)
  - Bash (if you do not have Linux you can try the Git for Window's Bash instead)
- - Image Magick
  - ESRGAN: https://github.com/xinntao/ESRGAN
  - SFTGAN: https://github.com/xinntao/SFTGAN
  - Python 3 64-bit
+ - Image Magick
  - PyTorch
- - Cuda (optional, but recommended if you have an NVidia)
