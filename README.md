@@ -90,10 +90,12 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 - If Image Magick keeps complaining about memory limits you can comment out the `resource` lines in `policy.xml`
 
 ## Requirements
- - Cuda (optional, but recommended if you have an NVidia) (On Linux you can just install the latest NVidia drivers)
  - Bash (if you do not have Linux you can try the Git for Window's Bash instead)
+ - Image Magick
+
+### Required if you want to use ESRGAN and/or SFTGAN
+ - Cuda (optional, but recommended if you have an NVidia) (On Linux you can just install the latest NVidia drivers)
  - ESRGAN: https://github.com/xinntao/ESRGAN
  - SFTGAN: https://github.com/xinntao/SFTGAN
  - Python 3 64-bit
- - Image Magick
  - PyTorch
