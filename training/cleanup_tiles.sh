@@ -27,7 +27,19 @@ LR_OUTPUT_DIR=${OUTPUT_DIR}/LR
 # Ground truth
 HR_OUTPUT_DIR=${OUTPUT_DIR}/HR
 
-find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENAME; do
+wait_for_jobs() {
+  local JOBLIST=($(jobs -p))
+  if [ "${#JOBLIST[@]}" -gt "16" ]; then
+    for JOB in ${JOBLIST}; do
+      echo Waiting for job ${JOB}...
+      wait ${JOB}
+    done
+  fi
+}
+
+cleanup_task() {
+
+  FILENAME="$@"
 
   DIRNAME=$(dirname "${FILENAME}")
 
@@ -45,31 +57,38 @@ find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FI
   echo ${RELATIVE_DIR}/${BASENAME_NO_EXT} \(${IMAGE_WIDTH} ${IMAGE_HEIGHT} ${IMAGE_CHANNELS} ${IMAGE_COLORS}\)
 
   if [ "${IMAGE_COLORS}" -le "${MIN_COLORS}" ]; then
-    echo ${RELATIVE_DIR}, too little colors \(${IMAGE_COLORS}\), delete
+    echo ${BASENAME_NO_EXT}, too little colors \(${MIN_COLORS}\), delete
     rm -f ${HR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     rm -f ${LR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
-    continue
+    return
   fi
   
   if [ "${IMAGE_CHANNELS}" != "rgb" ] && [ "${IMAGE_CHANNELS}" != "srgb" ]; then
-    echo ${RELATIVE_DIR}, not rgb \(${IMAGE_CHANNELS}\), delete
+    echo ${BASENAME_NO_EXT}, not rgb \(${IMAGE_CHANNELS}\), delete
     rm -f ${HR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     rm -f ${LR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
-    continue
+    return
   fi
 
   if [ "${IMAGE_WIDTH}" -lt "${HR_MIN_TILE_WIDTH}" ] || [ "${IMAGE_HEIGHT}" -lt "${HR_MIN_TILE_HEIGHT}" ]; then
-    echo ${RELATIVE_DIR}, too small \(${IMAGE_WIDTH}x${IMAGE_HEIGHT}\), delete
+    echo ${BASENAME_NO_EXT}, too small \(${IMAGE_WIDTH}x${IMAGE_HEIGHT}\), delete
     rm -f ${HR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     rm -f ${LR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
-    continue
+    return
   fi
 
   if [ "${IMAGE_WIDTH}" -gt "${HR_MAX_TILE_WIDTH}" ] || [ "${IMAGE_HEIGHT}" -gt "${HR_MAX_TILE_HEIGHT}" ]; then
-    echo ${RELATIVE_DIR}, too big \(${IMAGE_WIDTH}x${IMAGE_HEIGHT}\), delete
+    echo ${BASENAME_NO_EXT}, too big \(${IMAGE_WIDTH}x${IMAGE_HEIGHT}\), delete
     rm -f ${HR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     rm -f ${LR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
-    continue
+    return
   fi
-  
+
+}
+
+find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FILENAME; do
+ wait_for_jobs
+ cleanup_task ${FILENAME} &
 done
+
+wait_for_jobs
