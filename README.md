@@ -10,7 +10,7 @@
 
  - Follow the instructions for installing SFTGAN at: https://github.com/xinntao/SFTGAN
 
-## Usage
+## Usage (inference)
 
  - Put all the textures you want to process inside the `./input` directory
 
@@ -32,6 +32,16 @@
  **Note:** You may want to upscale normal maps using ESRGAN only. Do not forget to renormalize them.
  
  **Note:** If you change the overlap in step 1, change the overlap in step 6 accordingly
+ 
+## Usage (training) (WiP)
+
+ - Put all textures you want to use for training in `./training/input`
+ 
+ - Go to the `./training` directory
+ 
+ - Run `./create_tiles.sh`
+ 
+ - Run `./cleanup_tiles.sh`
  
 ## Troubleshooting
 
