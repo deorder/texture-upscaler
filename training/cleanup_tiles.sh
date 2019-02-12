@@ -45,7 +45,7 @@ find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \) | while read FI
   echo ${RELATIVE_DIR}/${BASENAME_NO_EXT} \(${IMAGE_WIDTH} ${IMAGE_HEIGHT} ${IMAGE_CHANNELS} ${IMAGE_COLORS}\)
 
   if [ "${IMAGE_COLORS}" -le "${MIN_COLORS}" ]; then
-    echo ${RELATIVE_DIR}, too little colors \(${MIN_COLORS}\), delete
+    echo ${RELATIVE_DIR}, too little colors \(${IMAGE_COLORS}\), delete
     rm -f ${HR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     rm -f ${LR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     continue
