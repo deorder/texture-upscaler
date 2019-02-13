@@ -70,7 +70,7 @@ for OPTION in "$@"; do
       echo "-l, --interpolate \"<interpolate>\" (default: ${INTERPOLATE})"
       echo "-w, --tile-width \"<pixels>\" (default: ${TILE_WIDTH})"
       echo "-h, --tile-height \"<pixels>\" (default: ${TILE_HEIGHT})"
-      echo "-o, --overdraw \"<pixels>\" (default: ${OVERDRAW})"
+      echo "-d, --overdraw \"<pixels>\" (default: ${OVERDRAW})"
       exit 1
     ;;
   esac

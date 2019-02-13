@@ -4,6 +4,7 @@ shopt -s extglob
 THREADS=4
 
 RESIZE=100%
+OVERDRAW=64
 
 FILTER=SincFast
 INTERPOLATE=Bilinear
@@ -45,6 +46,10 @@ for OPTION in "$@"; do
     INTERPOLATE="${OPTION#*=}"
     shift
     ;;
+    -d=*|--overdraw=*)
+    OVERDRAW="${OPTION#*=}"
+    shift
+    ;;
     -p=*|--input-postfix=*)
     INPUT_POSTFIX="${OPTION#*=}"
     shift
@@ -59,6 +64,7 @@ for OPTION in "$@"; do
       echo "-f, --filter \"<filter>\" (default: ${FILTER})"
       echo "-l, --interpolate \"<interpolate>\" (default: ${INTERPOLATE})"
       echo "-p, --input-postfix \"<string>\" (default: ${INPUT_POSTFIX})"
+      echo "-d, --overdraw \"<pixels>\" (default: ${OVERDRAW})"
       exit 1
     ;;
   esac
@@ -76,6 +82,9 @@ wait_for_jobs() {
 
 while read ENTRY; do
 
+  OVERDRAW_WIDTH=${OVERDRAW}
+  OVERDRAW_HEIGHT=${OVERDRAW}
+
   DIRNAME=$(echo ${ENTRY} | cut -d':' -f3)
   DIRNAME_HASH=$(echo ${ENTRY} | cut -d':' -f1)
   BASENAME_NO_EXT=$(echo ${ENTRY} | cut -d':' -f2)
@@ -91,9 +100,6 @@ while read ENTRY; do
 
   TILE_WIDTH=$(echo ${TILE_INFO} | cut -d' ' -f 1)
   TILE_HEIGHT=$(echo ${TILE_INFO} | cut -d' ' -f 2)
-
-  OVERDRAW_WIDTH=$((${TILE_WIDTH} - (${IMAGE_WIDTH} / ${TILES_PER_ROW})))
-  OVERDRAW_HEIGHT=$((${TILE_HEIGHT} - (${IMAGE_HEIGHT} / ${TILES_PER_COLUMN})))
 
   echo ${BASENAME_NO_EXT} ${DIRNAME} ${IMAGE_CHANNELS} ${DIRNAME_HASH}
 
