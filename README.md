@@ -16,6 +16,8 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 `training/step2_cleanup_tiles.sh`: Cleanup tiles, remove tiles that have too little colors and/or that do not fit the required size for HR/GT and LR
 
+`training/step3_select_tiles.sh`: Select tiles according to a specified percentage for training and validation
+
 ## Installation for use with ESRGAN and/or SFTGAN
 
 ### If you want to use ESRGAN
@@ -81,8 +83,10 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - Put all textures you want to use for training in `./training/input`
  - Go to the `./training` directory
  - `./step1_create_tiles.sh`
- - `./step2_cleanup_tiles.sh`
  - Results will be inside `./training/output`
+ - `./step2_cleanup_tiles.sh`
+ - `./step3_select_tiles.sh`
+ - End result will be inside `./training/output_training` and `./training/output_validation`
  
 ## Troubleshooting
 
