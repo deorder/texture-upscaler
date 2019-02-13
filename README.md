@@ -4,6 +4,8 @@
 
 The included scripts are for preparing your images to be used by ESRGAN, SFTGAN etc. and ressassemble them (no seams)
 
+**Note:** Will only work on power of 2 sized textures at the moment
+
 ### Scripts to prepare for inference ###
 `step1_create_tiles.sh`: Create tiles with overlap, separating the RGB and alpha, with optional rescaling
 
