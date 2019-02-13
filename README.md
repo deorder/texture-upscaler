@@ -68,14 +68,10 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
   - `./step3_assemble_tiles.sh --input-dir="./esrgan/results" --input-postfix="_rlt"`
   - Results will be inside `./output`
 
- **Note:** Try out different combinations. All shell scripts have options that you can change at the top
+ **Note:** Try out different combinations of settings, use `./<script>.sh --help`
  
  **Note:** Upscaling the textures before running SFT may give better results
  
- **Note:** You may want to upscale normal maps using ESRGAN only. Do not forget to renormalize them.
- 
- **Note:** If you change the overlap in step 1, change the overlap in step 6 accordingly
-
  **Note:** Everything works much better on Linux
 
 ## Usage to prepare for training (WiP)
