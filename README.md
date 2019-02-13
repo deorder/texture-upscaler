@@ -4,14 +4,14 @@
 
 The included scripts are for preparing your images to be used by ESRGAN, SFTGAN or others
 
-### Description of steps to prepare for inference ###
+### Description of scripts to prepare for inference ###
 `step1_create_tiles.sh`: Create tiles with overlap, separating the RGB and alpha, with optional rescaling
 
 `step2_copy_tiles.sh`: Copy tiles from one directory to the next, with optional rescaling while copying
 
 `step3_assemble_tiles.sh`: Reassemble tiles and use the overlap for blending (to remove seams), recombine the RGB and alpha, with optional rescaling
 
-### Description of steps to prepare for training  ###
+### Description of scripts to prepare for training  ###
 `training/step1_create_tiles.sh`: Create equal size tiles (1 for HR/GT, 1 downscaled for LR), separating the RGB and alpha, use separate directories according to regexp
 
 `training/step2_cleanup_tiles.sh`: Cleanup tiles, remove tiles that have too little colors and/or that do not fit the required size for HR/GT and LR
