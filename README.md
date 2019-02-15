@@ -22,15 +22,20 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 ## Installation for use with ESRGAN and/or SFTGAN
 
-### If you want to use ESRGAN
+### If you want to use ESRGAN to upscale
 
  - Install ESRGAN to `./esrgan`
  - Follow the instructions for installing ESRGAN at: https://github.com/xinntao/ESRGAN
 
-### If you want to use SFTGAN
+### If you want to use SFTGAN to upscale
 
  - Install SFTGAN to `./sftgan`
  - Follow the instructions for installing SFTGAN at: https://github.com/xinntao/SFTGAN
+
+### If you want to train SFTGAN and/or SFTGAN
+
+ - Install BasicSR to `./basicsr`
+ - Follow the instructions for installing BasicSR at: https://github.com/xinntao/BasicSR
 
 ## Usage for inference/upscaling with ESRGAN and/or SFTGAN
 
@@ -76,7 +81,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  
  **Note:** Everything works much better on Linux
 
-## Usage to prepare for training (WiP)
+## Usage for training ESRGAN and/or SFTGAN
 
  - Put all textures you want to use for training in `./training/input`
  - Go to the `./training` directory
