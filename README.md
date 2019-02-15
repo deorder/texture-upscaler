@@ -1,4 +1,4 @@
-# Scripts to prepare textures for ESRGAN, SFTGAN or others
+# Shell scripts to prepare textures for ESR/SFTGAN etc.
 
 Table of Contents
 =================
