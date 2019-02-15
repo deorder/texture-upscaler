@@ -85,6 +85,18 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - `./step2_cleanup_tiles.sh`
  - `./step3_select_tiles.sh`
  - End result will be inside `./training/output_training` and `./training/output_validation`
+ - Go to `<basicsr path>/codes` and modify the `train_ESRGAN.json`:
+   - Change the `name` to something else that has no `debug` in it.
+   - In `train` you may want to decrease the `n_workers` and `batch_size` values to for ex.: 4 and 8
+   - In `train` point the `dataroot_LR` to `<path>/training/output_training/LR`
+   - In `train` point the `dataroot_HR` to `<path>/training/output_training/HR`
+   - In `val` point the `dataroot_LR` to `<path>/training/output_validation/LR`
+   - In `val` point the `dataroot_HR` to `<path>/training/output_validation/HR`
+   - In `path` you may have to remove `resume_state` for now
+ - In `<basicsr path>/codes` run the following: `python3 train.py -opt options/train/train_ESRGAN.json`
+ - Results will be inside `<basicsr path>/experiments`, after every X iterations it will write some validation results
+ - If you are happy with the validation results you can stop the training using Ctrl+C
+ - If you want to continue training make sure that in `train_ESRGAN.json` the `resume_state` is set in `path` pointing to the state file `<basicsr path>/experiments/<name>/training_state/<state file>.state` you want to continue training from
  
 ## Troubleshooting
 
@@ -101,3 +113,8 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - SFTGAN: https://github.com/xinntao/SFTGAN
  - Python 3 64-bit
  - PyTorch
+ 
+## Required if you want to train ESRGAN
+ - Python modules: numpy opencv-python torchvision tensorboardX lmdb
+ - BasicSR: https://github.com/xinntao/BasicSR/
+
