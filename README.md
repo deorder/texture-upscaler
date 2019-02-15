@@ -20,7 +20,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 `training/step3_select_tiles.sh`: Select tiles according to a specified percentage to be used for training and validation
 
-## Installation for use with ESRGAN and/or SFTGAN
+## Installing ESRGAN and/or SFTGAN
 
 ### If you want to use ESRGAN to upscale
 
