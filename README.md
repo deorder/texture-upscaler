@@ -90,7 +90,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - `./step2_cleanup_tiles.sh`
  - `./step3_select_tiles.sh`
  - End result will be inside `./training/output_training` and `./training/output_validation`
- - Go to `<basicsr path>/codes` and modify the `train_ESRGAN.json`:
+ - Go to `<basicsr path>/codes` and modify the `options/train/train_ESRGAN.json` file as follows:
    - Change the `name` to something else that has no `debug` in it.
    - In `train` you may want to decrease the `n_workers` and `batch_size` values to for ex.: 4 and 8
    - In `train` point the `dataroot_LR` to `<path>/training/output_training/LR`
