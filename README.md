@@ -1,5 +1,27 @@
 # Cathedral Project texture scripts to prepare for ESRGAN, SFTGAN or others
 
+Table of Contents
+=================
+
+   * [Cathedral Project texture scripts to prepare for ESRGAN, SFTGAN or others](#cathedral-project-texture-scripts-to-prepare-for-esrgan-sftgan-or-others)
+      * [Description](#description)
+         * [Scripts to prepare for inference](#scripts-to-prepare-for-inference)
+         * [Scripts to prepare for training](#scripts-to-prepare-for-training)
+      * [Installing ESRGAN and/or SFTGAN](#installing-esrgan-andor-sftgan)
+         * [If you want to use ESRGAN to upscale](#if-you-want-to-use-esrgan-to-upscale)
+         * [If you want to use SFTGAN to upscale](#if-you-want-to-use-sftgan-to-upscale)
+         * [If you want to train SFTGAN and/or SFTGAN](#if-you-want-to-train-sftgan-andor-sftgan)
+      * [Usage for inference/upscaling with ESRGAN and/or SFTGAN](#usage-for-inferenceupscaling-with-esrgan-andor-sftgan)
+         * [Steps when you want to use ESRGAN only](#steps-when-you-want-to-use-esrgan-only)
+         * [Steps when you want to use SFTGAN only](#steps-when-you-want-to-use-sftgan-only)
+         * [Steps when you want to use ESRGAN and then SFTGAN](#steps-when-you-want-to-use-esrgan-and-then-sftgan)
+         * [Steps when you want to use SFTGAN and then ESRGAN](#steps-when-you-want-to-use-sftgan-and-then-esrgan)
+      * [Usage for training ESRGAN and/or SFTGAN](#usage-for-training-esrgan-andor-sftgan)
+      * [Troubleshooting](#troubleshooting)
+      * [Requirements](#requirements)
+         * [Required if you want to use ESRGAN and/or SFTGAN](#required-if-you-want-to-use-esrgan-andor-sftgan)
+      * [Required if you want to train ESRGAN](#required-if-you-want-to-train-esrgan)
+
 ## Description
 
 The included scripts are for preparing your images to be used by ESRGAN, SFTGAN etc. and ressassemble them (no seams)
