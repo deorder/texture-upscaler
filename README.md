@@ -1,4 +1,4 @@
-# Cathedral Project texture scripts to prepare for ESRGAN, SFTGAN or others
+# Shell scripts to prepare textures for ESRGAN, SFTGAN or others
 
 Table of Contents
 =================
