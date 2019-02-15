@@ -119,6 +119,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
    - In `train` point the `dataroot_HR` to `<path>/training/output_training/HR`
    - In `val` point the `dataroot_LR` to `<path>/training/output_validation/LR`
    - In `val` point the `dataroot_HR` to `<path>/training/output_validation/HR`
+   - In `path` change `root` to the folder where BasicSR is installed
    - In `path` you may have to remove `resume_state` for now
  - In `<basicsr path>/codes` run the following: `python3 train.py -opt options/train/train_ESRGAN.json`
  - Results will be inside `<basicsr path>/experiments`, after every X iterations it will write some validation results
