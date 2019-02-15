@@ -3,6 +3,7 @@
 Table of Contents
 =================
 
+  * [Cathedral Project texture scripts to prepare for ESRGAN, SFTGAN or others](#cathedral-project-texture-scripts-to-prepare-for-esrgan-sftgan-or-others)
       * [Description](#description)
          * [Scripts to prepare for inference](#scripts-to-prepare-for-inference)
          * [Scripts to prepare for training](#scripts-to-prepare-for-training)
@@ -20,6 +21,7 @@ Table of Contents
       * [Requirements](#requirements)
          * [Required if you want to use ESRGAN and/or SFTGAN](#required-if-you-want-to-use-esrgan-andor-sftgan)
       * [Required if you want to train ESRGAN](#required-if-you-want-to-train-esrgan)
+
 
 ## Description
 
