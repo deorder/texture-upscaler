@@ -83,6 +83,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
   - `./step1_create_tiles.sh --output-dir="./esrgan/LR"`
   - `pushd ./esrgan/; python3 test.py ./models/RRDB_ESRGAN_x4.pth; popd` (Replace model path if you want)
   - `./step2_copy_tiles.sh --input-dir="./esrgan/results" --output-dir"./sftgan/data/samples" --input-postfix="_rlt"`
+  - `pushd ./sftgan/pytorch_test/; python3 test_segmentation.py; popd`
   - `pushd ./sftgan/pytorch_test/; python3 test_sftgan.py; popd`
   - `./step3_assemble_tiles.sh --input-dir="./sftgan/data/samples_result" --input-postfix="_rlt"`
   - Results will be inside `./output`
@@ -91,6 +92,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
   - Put all the textures you want to process inside the `./input` directory
   - `./step1_create_tiles.sh --output-dir="./sftgan/data/samples" --rescale="200%"` (SFTGAN requires you to upscale first)
+  - `pushd ./sftgan/pytorch_test/; python3 test_segmentation.py; popd`
   - `pushd ./sftgan/pytorch_test/; python3 test_sftgan.py; popd`
   - `./step2_copy_tiles.sh --input-dir="./sftgan/data/samples_result" --output-dir="./esrgan/LR" --input-postfix="_rlt"`
   - `pushd ./esrgan/; python3 test.py ./models/RRDB_ESRGAN_x4.pth; popd` (Replace model path if you want)
