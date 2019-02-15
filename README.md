@@ -142,7 +142,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - Python 3 64-bit
  - PyTorch
  
-## Required if you want to train ESRGAN
+### Required if you want to train ESRGAN
  - Python modules: numpy opencv-python torchvision tensorboardX lmdb
  - BasicSR: https://github.com/xinntao/BasicSR/
 
