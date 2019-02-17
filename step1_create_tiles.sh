@@ -99,14 +99,14 @@ create_tiles_task() {
 
   OUTPUT_BASENAME="$2"
 
-  TILES_PER_ROW=$((${IMAGE_WIDTH} / ${TILE_WIDTH}))
-  TILES_PER_COLUMN=$((${IMAGE_HEIGHT} / ${TILE_HEIGHT}))
+  ROWS=$((${IMAGE_HEIGHT} / ${TILE_HEIGHT}))
+  COLUMNS=$((${IMAGE_WIDTH} / ${TILE_WIDTH}))
 
   if [ "${IMAGE_CHANNELS}" == "rgb" ] || [ "${IMAGE_CHANNELS}" == "rgba" ] || [ "${IMAGE_CHANNELS}" == "srgb" ] || [ "${IMAGE_CHANNELS}" == "srgba" ]; then
-    for TILE_ROW_INDEX in $(seq 0 $((${TILES_PER_ROW} - 1))); do
-      for TILE_COLUMN_INDEX in $(seq 0 $((${TILES_PER_COLUMN} - 1))); do
+    for TILE_COLUMN_INDEX in $(seq 0 $((${COLUMNS} - 1))); do
+      for TILE_ROW_INDEX in $(seq 0 $((${ROWS} - 1))); do
 
-        TILE_INDEX=$(((${TILE_ROW_INDEX} * ${TILES_PER_COLUMN}) + ${TILE_COLUMN_INDEX}))
+        TILE_INDEX=$(((${TILE_ROW_INDEX} * ${COLUMNS}) + ${TILE_COLUMN_INDEX}))
         TILE_X1=$((${TILE_COLUMN_INDEX} * ${TILE_WIDTH}))
         TILE_Y1=$((${TILE_ROW_INDEX} * ${TILE_HEIGHT}))
         TILE_X2=$(((${TILE_COLUMN_INDEX} * ${TILE_WIDTH}) + ${TILE_WIDTH}))
@@ -142,15 +142,15 @@ while read FILENAME; do
   echo ${FILENAME}
   create_tiles_task "${FILENAME}" "${OUTPUT_DIR}/${DIRNAME_HASH}_${BASENAME_NO_EXT}" ${IMAGE_WIDTH} ${IMAGE_HEIGHT} ${IMAGE_CHANNELS} &
 
-  TILES_PER_ROW=$((${IMAGE_WIDTH} / ${TILE_WIDTH}))
-  TILES_PER_COLUMN=$((${IMAGE_HEIGHT} / ${TILE_HEIGHT}))
+  ROWS=$((${IMAGE_HEIGHT} / ${TILE_HEIGHT}))
+  COLUMNS=$((${IMAGE_WIDTH} / ${TILE_WIDTH}))
 
   RELATIVE_DIR=$(realpath --relative-to "${INPUT_DIR}" "${DIRNAME}")
 
   if [ "${IMAGE_CHANNELS}" == "rgba" ] || [ "${IMAGE_CHANNELS}" == "srgba" ]; then
-    echo "${DIRNAME_HASH}:${BASENAME_NO_EXT}:${RELATIVE_DIR}:rgba:${IMAGE_WIDTH}:${IMAGE_HEIGHT}:${TILES_PER_ROW}:${TILES_PER_COLUMN}" >> "${INDEX_FILE}"
+    echo "${DIRNAME_HASH}:${BASENAME_NO_EXT}:${RELATIVE_DIR}:rgba:${IMAGE_WIDTH}:${IMAGE_HEIGHT}:${ROWS}:${COLUMNS}" >> "${INDEX_FILE}"
   elif [ "${IMAGE_CHANNELS}" == "rgb" ] || [ "${IMAGE_CHANNELS}" == "srgb" ]; then
-    echo "${DIRNAME_HASH}:${BASENAME_NO_EXT}:${RELATIVE_DIR}:rgb:${IMAGE_WIDTH}:${IMAGE_HEIGHT}:${TILES_PER_ROW}:${TILES_PER_COLUMN}" >> "${INDEX_FILE}"
+    echo "${DIRNAME_HASH}:${BASENAME_NO_EXT}:${RELATIVE_DIR}:rgb:${IMAGE_WIDTH}:${IMAGE_HEIGHT}:${ROWS}:${COLUMNS}" >> "${INDEX_FILE}"
   fi
 
 done < <(find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \))

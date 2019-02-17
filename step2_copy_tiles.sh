@@ -89,10 +89,10 @@ copy_task() {
   IMAGE_HEIGHT=$(echo ${ENTRY} | cut -d':' -f6)
   IMAGE_CHANNELS=$(echo ${ENTRY} | cut -d':' -f4)
 
-  TILES_PER_ROW=$(echo ${ENTRY} | cut -d':' -f7)
-  TILES_PER_COLUMN=$(echo ${ENTRY} | cut -d':' -f8)
+  COLUMNS=$(echo ${ENTRY} | cut -d':' -f8)
+  ROWS=$(echo ${ENTRY} | cut -d':' -f7)
 
-  TILE_COUNT=$((${TILES_PER_ROW} * ${TILES_PER_COLUMN}))
+  TILE_COUNT=$((${ROWS} * ${COLUMNS}))
 
   echo ${BASENAME_NO_EXT} ${DIRNAME} ${IMAGE_CHANNELS} ${DIRNAME_HASH}
 

@@ -89,13 +89,14 @@ while read ENTRY; do
   DIRNAME_HASH=$(echo ${ENTRY} | cut -d':' -f1)
   BASENAME_NO_EXT=$(echo ${ENTRY} | cut -d':' -f2)
 
+  
   IMAGE_WIDTH=$(echo ${ENTRY} | cut -d':' -f5)
   IMAGE_HEIGHT=$(echo ${ENTRY} | cut -d':' -f6)
   IMAGE_CHANNELS=$(echo ${ENTRY} | cut -d':' -f4)
   
-  TILES_PER_ROW=$(echo ${ENTRY} | cut -d':' -f7)
-  TILES_PER_COLUMN=$(echo ${ENTRY} | cut -d':' -f8)
-  
+  COLUMNS=$(echo ${ENTRY} | cut -d':' -f8)
+  ROWS=$(echo ${ENTRY} | cut -d':' -f7)
+
   TILE_INFO=$(identify -format '%[width] %[height]' "${INPUT_DIR}/${DIRNAME_HASH}_${BASENAME_NO_EXT}_0${INPUT_POSTFIX}.png")
 
   TILE_WIDTH=$(echo ${TILE_INFO} | cut -d' ' -f 1)
@@ -107,10 +108,10 @@ while read ENTRY; do
 
   COMPOSITE_ARGS=""
   ALPHA_COMPOSITE_ARGS=""
-  for TILE_ROW_INDEX in $(seq $((${TILES_PER_ROW} - 1)) -1 0); do
-    for TILE_COLUMN_INDEX in $(seq $((${TILES_PER_COLUMN} - 1)) -1 0); do
+  for TILE_ROW_INDEX in $(seq $((${ROWS} - 1)) -1 0); do
+    for TILE_COLUMN_INDEX in $(seq $((${COLUMNS} - 1)) -1 0); do
 
-      TILE_INDEX=$(((${TILE_ROW_INDEX} * ${TILES_PER_COLUMN}) + ${TILE_COLUMN_INDEX}))
+      TILE_INDEX=$(((${TILE_ROW_INDEX} * ${COLUMNS}) + ${TILE_COLUMN_INDEX}))
       TILE_X1=$((${TILE_COLUMN_INDEX} * (${TILE_WIDTH} - ${OVERDRAW_WIDTH})))
       TILE_Y1=$((${TILE_ROW_INDEX} * (${TILE_HEIGHT} - ${OVERDRAW_HEIGHT})))
       TILE_X2=$((${TILE_X1} + ${TILE_WIDTH}))
