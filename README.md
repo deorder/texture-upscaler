@@ -28,6 +28,8 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 **Note:** Will only work on power of 2 sized textures at the moment
 
+**Note:** When `.` is mentioned before a path, it means relative to the `ctp-texture-upscale` directory
+
 ### Scripts to prepare for inference ###
 `step1_create_tiles.sh`: Create tiles with overlap, separating the RGB and alpha, with optional rescaling
 
