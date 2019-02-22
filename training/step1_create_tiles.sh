@@ -6,8 +6,8 @@ INPUT_DIR="./input"
 
 # Examples
 LR_SCALE=25%
-LR_FILTER=point
-LR_INTERPOLATE=Nearest
+LR_FILTER=Catrom
+LR_INTERPOLATE=Catrom
 LR_OUTPUT_DIR="./output/LR"
 
 # Ground truth
