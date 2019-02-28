@@ -120,16 +120,33 @@ while read ENTRY; do
       INPUT_FILENAME="${INPUT_DIR}/${DIRNAME_HASH}_${BASENAME_NO_EXT}_${TILE_INDEX}${INPUT_POSTFIX}.png"
       ALPHA_INPUT_FILENAME="${INPUT_DIR}/${DIRNAME_HASH}_${BASENAME_NO_EXT}_alpha_${TILE_INDEX}${INPUT_POSTFIX}.png"
 
-      COMPOSITE_ARGS="${COMPOSITE_ARGS} \\( \"${INPUT_FILENAME}\" -clone 0 -compose CopyOpacity +matte -composite -repage +${TILE_X1}+${TILE_Y1} \\)"
-      ALPHA_COMPOSITE_ARGS="${ALPHA_COMPOSITE_ARGS} \\( \"${ALPHA_INPUT_FILENAME}\" -clone 0 -compose CopyOpacity +matte -composite -repage +${TILE_X1}+${TILE_Y1} \\)"
+      if [ "${COLUMNS}" -gt "1" ] || [ "${COLUMNS}" -gt "1" ]; then
+        COMPOSITE_ARGS="${COMPOSITE_ARGS} \\( \"${INPUT_FILENAME}\" -clone 0 -compose CopyOpacity +matte -composite -repage +${TILE_X1}+${TILE_Y1} \\)"
+        ALPHA_COMPOSITE_ARGS="${ALPHA_COMPOSITE_ARGS} \\( \"${ALPHA_INPUT_FILENAME}\" -clone 0 -compose CopyOpacity +matte -composite -repage +${TILE_X1}+${TILE_Y1} \\)"
+      else
+        COMPOSITE_ARGS="${COMPOSITE_ARGS} \\( \"${INPUT_FILENAME}\" -repage +${TILE_X1}+${TILE_Y1} \\)"
+        ALPHA_COMPOSITE_ARGS="${ALPHA_COMPOSITE_ARGS} \\( \"${ALPHA_INPUT_FILENAME}\" -repage +${TILE_X1}+${TILE_Y1} \\)"
+      fi
 
     done
   done
+  
+  if [ "${ROWS}" -gt "1" ]; then
+    BLEND_WIDTH_ARGS="\\( -size ${TILE_WIDTH}x${OVERDRAW_HEIGHT} gradient: -append -rotate 180 \\) -composite -compose multiply"
+  fi
 
-  BLEND_ARGS="\\( -size ${TILE_WIDTH}x${TILE_HEIGHT} xc:white \\( -size ${TILE_HEIGHT}x${OVERDRAW_WIDTH} gradient: -append -rotate 90 \\) -composite -compose multiply \\( -size ${TILE_WIDTH}x${OVERDRAW_HEIGHT} gradient: -append -rotate 180 \\) -composite -rotate 180 \\)"
+  if [ "${COLUMNS}" -gt "1" ]; then
+    BLEND_HEIGHT_ARGS="\\( -size ${TILE_HEIGHT}x${OVERDRAW_WIDTH} gradient: -append -rotate 90 \\) -composite -compose multiply"
+  fi
 
-  ALPHA_ARGS="${BLEND_ARGS} ${ALPHA_COMPOSITE_ARGS} -delete 0 -compose Over -mosaic"
-  RGB_ARGS="${BLEND_ARGS} ${COMPOSITE_ARGS} -delete 0 -compose Over -mosaic"
+  if [ "${COLUMNS}" -gt "1" ] || [ "${COLUMNS}" -gt "1" ]; then
+    BLEND_ARGS="\\( -size ${TILE_WIDTH}x${TILE_HEIGHT} xc:white ${BLEND_HEIGHT_ARGS} ${BLEND_WIDTH_ARGS} -rotate 180 \\)"
+    ALPHA_ARGS="${BLEND_ARGS} ${ALPHA_COMPOSITE_ARGS} -delete 0 -compose Over -mosaic"
+    RGB_ARGS="${BLEND_ARGS} ${COMPOSITE_ARGS} -delete 0 -compose Over -mosaic"
+  else
+    ALPHA_ARGS="${ALPHA_COMPOSITE_ARGS} -mosaic"
+    RGB_ARGS="${COMPOSITE_ARGS} -mosaic"
+  fi
 
   if [ "${IMAGE_CHANNELS}" == "rgba" ] || [ "${IMAGE_CHANNELS}" == "srgba" ]; then
     COMMAND="convert \\( ${RGB_ARGS} -interpolate ${INTERPOLATE} -filter ${FILTER} -resize ${RESIZE} \\) \\( ${ALPHA_ARGS} -colorspace gray -alpha off -interpolate ${INTERPOLATE} -filter ${FILTER} -resize ${RESIZE} \\) -compose copy-opacity -composite \"${OUTPUT_DIR}/${DIRNAME}/${BASENAME_NO_EXT}.png\""

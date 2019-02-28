@@ -100,7 +100,13 @@ create_tiles_task() {
   OUTPUT_BASENAME="$2"
 
   ROWS=$((${IMAGE_HEIGHT} / ${TILE_HEIGHT}))
+  if [ "${ROWS}" -le 0 ]; then
+    ROWS=1
+  fi
   COLUMNS=$((${IMAGE_WIDTH} / ${TILE_WIDTH}))
+  if [ "${COLUMNS}" -le 0 ]; then
+    COLUMNS=1
+  fi
 
   if [ "${IMAGE_CHANNELS}" == "rgb" ] || [ "${IMAGE_CHANNELS}" == "rgba" ] || [ "${IMAGE_CHANNELS}" == "srgb" ] || [ "${IMAGE_CHANNELS}" == "srgba" ]; then
     for TILE_COLUMN_INDEX in $(seq 0 $((${COLUMNS} - 1))); do
@@ -143,7 +149,13 @@ while read FILENAME; do
   create_tiles_task "${FILENAME}" "${OUTPUT_DIR}/${DIRNAME_HASH}_${BASENAME_NO_EXT}" ${IMAGE_WIDTH} ${IMAGE_HEIGHT} ${IMAGE_CHANNELS} &
 
   ROWS=$((${IMAGE_HEIGHT} / ${TILE_HEIGHT}))
+  if [ "${ROWS}" -le 0 ]; then
+    ROWS=1
+  fi
   COLUMNS=$((${IMAGE_WIDTH} / ${TILE_WIDTH}))
+  if [ "${COLUMNS}" -le 0 ]; then
+    COLUMNS=1
+  fi
 
   RELATIVE_DIR=$(realpath --relative-to "${INPUT_DIR}" "${DIRNAME}")
 
