@@ -137,7 +137,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 ## Requirements
  - Bash (if you do not have Linux you can try the Git for Window's Bash instead)
- - Image Magick
+ - Image Magick 6 (Image Magick 7 does not work with this script yet): https://imagemagick.org/download/binaries/ImageMagick-6.9.10-44-Q8-x64-dll.exe
 
 ### Required if you want to use ESRGAN and/or SFTGAN
  - Cuda (optional, but recommended if you have an NVidia) (On Linux you can just install the latest NVidia drivers)
